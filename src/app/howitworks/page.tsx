@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import styled from "styled-components";
 
-export default function HowItWorks() {
+export default function HowItWorksPage() {
   const steps = [
     {
       icon: "/Hicon1.png",
@@ -34,7 +34,7 @@ export default function HowItWorks() {
       title: "24/7 Helpline",
       description: (
         <>
-          <strong>7044432779</strong> — Save it now. Call us anytime you need help.
+          <strong>+91 7044432779</strong> — Save it now. Call us anytime you need help.
         </>
       ),
     },
@@ -90,7 +90,7 @@ export default function HowItWorks() {
 
 // ---------- styled-components ----------
 
-export const Section = styled.section`
+const Section = styled.section`
   padding: 50px 150px;
   background: #fafafa;
   background-image: url("/CBG.png");
@@ -106,7 +106,7 @@ export const Section = styled.section`
   }
 `;
 
-export const Heading = styled.h2`
+const Heading = styled.h2`
   font-size: 2.4rem;
   font-weight: 700;
   color: #000;
@@ -114,24 +114,24 @@ export const Heading = styled.h2`
   margin-bottom: 10px;
 
   span {
-    color: #0073D7;
+    color: #0073d7;
   }
 `;
 
-export const Subheading = styled.p`
+const Subheading = styled.p`
   margin-bottom: 40px;
   font-size: 1.1rem;
   color: #555;
   text-align: start;
 `;
 
-export const Steps = styled.div`
+const Steps = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
 `;
 
-export const Step = styled.div`
+const Step = styled.div`
   display: flex;
   align-items: flex-start;
   gap: 20px;
@@ -153,7 +153,7 @@ export const Step = styled.div`
   }
 `;
 
-export const IconCircle = styled.div`
+const IconCircle = styled.div`
   width: 60px;
   height: 60px;
   background: #eef6fe;
@@ -168,19 +168,19 @@ export const IconCircle = styled.div`
   }
 `;
 
-export const Icon = styled.img`
+const Icon = styled.img`
   width: 30px;
   height: 30px;
 `;
 
-export const Content = styled.div`
+const Content = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 8px;
 `;
 
-export const TitleRow = styled.div`
+const TitleRow = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
@@ -190,8 +190,8 @@ export const TitleRow = styled.div`
   }
 `;
 
-export const Number = styled.span`
-  background: #0073D7;
+const Number = styled.span`
+  background: #0073d7;
   color: #fff;
   font-size: 0.85rem;
   font-weight: 600;
@@ -204,14 +204,14 @@ export const Number = styled.span`
   flex-shrink: 0;
 `;
 
-export const Title = styled.h3`
+const Title = styled.h3`
   font-size: 1.2rem;
   font-weight: 600;
   color: #000;
   margin: 0;
 `;
 
-export const Description = styled.div`
+const Description = styled.div`
   font-size: 1rem;
   color: #444;
 
@@ -225,7 +225,7 @@ export const Description = styled.div`
   }
 `;
 
-export const FinalNote = styled.p`
+const FinalNote = styled.p`
   margin-top: 40px;
   font-size: 1.2rem;
   font-weight: 500;
