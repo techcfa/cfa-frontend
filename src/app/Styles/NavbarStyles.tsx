@@ -2,15 +2,17 @@ import styled from "styled-components";
 
 export const Nav = styled.nav`
   width: 100%;
-  position: sticky;
+  position: fixed;
   top: 0;
   left: 0;
+  right: 0;
+  height: 80px;
+  z-index: 1000;
   background: white;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 30px 150px;
-  z-index: 1000;
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
 
   @media (max-width: 1200px) {

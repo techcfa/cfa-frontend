@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 const PageContainer = styled.section`
   font-family: "Montserrat", sans-serif;
   color: #333;
+  margin-top: 60px;
   background: #fafafa;
 `;
 

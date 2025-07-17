@@ -57,12 +57,15 @@ export default function RootLayout({
         className={`
           ${montserrat.variable} ${lato.variable} 
           ${poppins.variable} ${nunitoSans.variable} 
-          antialiased
+          antialiased min-h-screen flex flex-col
         `}
+        style={{ overflowX: "hidden" }} // Prevents horizontal scroll
       >
         <StyledComponentsRegistry>
           <Navbar />
-          {children}
+          <main className="flex-1">
+            {children}
+          </main>
           <Footer />
         </StyledComponentsRegistry>
       </body>

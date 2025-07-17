@@ -22,7 +22,7 @@ export const Section = styled.section`
   }
 
   @media (max-width: 768px) {
-    padding: 2rem 20px;
+    padding: 8rem 20px;
     min-height: auto;
   }
 `;

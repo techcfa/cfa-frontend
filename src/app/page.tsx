@@ -15,7 +15,7 @@ import ContactUs from './contact/page';
 const page = () => {
   return (
     <>
-      <Home />
+     <Home />
      <Services />
       <About />
       <WhyChooseUs />
