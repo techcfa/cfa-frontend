@@ -61,7 +61,7 @@ export default function RootLayout({
         `}
       >
         <StyledComponentsRegistry>
-          <Navbar /> {/* 🔷 Navbar added here */}
+          <Navbar />
           {children}
           <Footer />
         </StyledComponentsRegistry>
