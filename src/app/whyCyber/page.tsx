@@ -135,8 +135,8 @@ export default function CyberFraudStats() {
           },
           {
             icon: "/icon2.png",
-            title: "1.7 million cases",
-            desc: "Officially reported in FY 2024. But real cases estimated at 8.5 million (including unreported)",
+            title: "17 lakhs cases",
+            desc: "Officially reported in FY 2024. But real cases estimated at 85 lakhs (including unreported)",
             delay: 0.1,
           },
           {
@@ -147,7 +147,7 @@ export default function CyberFraudStats() {
           },
           {
             icon: "/icon4.png",
-            title: "3+ million complaints",
+            title: "30 lakhs+ complaints",
             desc: "Projected next year, with losses > ₹20,000 crore",
             delay: 0.3,
           },

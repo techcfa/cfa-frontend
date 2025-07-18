@@ -186,7 +186,7 @@ const WhyChooseUs = () => {
 
           <div className="stat">
             <div className="big">
-              8.5+ <br /> million
+              85 <br /> lakhs+
             </div>
             <div className="label">potential fraud cases</div>
           </div>
