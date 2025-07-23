@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import axios from "axios"; // Import Axios
 import {
   Section,
   LeftPanel,
@@ -36,16 +37,18 @@ const ContactUs = () => {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
-    phone: "",
+    phoneNumber: "",
     city: "",
     contactAs: "",
-    contactType: "",
+    helpType: "",
     message: "",
-    preferredMode: "",
+    preferredContact: "",
     bestTime: "",
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [submissionMessage, setSubmissionMessage] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -55,22 +58,68 @@ const ContactUs = () => {
     const newErrors: { [key: string]: string } = {};
     if (!formData.fullName.trim()) newErrors.fullName = "Full Name is required";
     if (!formData.email.trim() || !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Valid Email is required";
-    if (!formData.phone.trim() || !/^\d{10}$/.test(formData.phone)) newErrors.phone = "Valid Phone Number is required";
+    if (!formData.phoneNumber.trim() || !/^\d{10}$/.test(formData.phoneNumber)) newErrors.phoneNumber = "Valid Phone Number is required";
     if (!formData.city.trim()) newErrors.city = "City is required";
     if (!formData.contactAs) newErrors.contactAs = "Please select a contact type";
-    if (!formData.contactType) newErrors.contactType = "Please select a contact type";
+    if (!formData.helpType) newErrors.helpType = "Please select a help type";
     if (!formData.message.trim()) newErrors.message = "Message is required";
-    if (!formData.preferredMode) newErrors.preferredMode = "Select preferred contact mode";
+    if (!formData.preferredContact) newErrors.preferredContact = "Select preferred contact mode";
     if (!formData.bestTime) newErrors.bestTime = "Select best time to reach you";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmissionMessage(null); // Clear previous messages
+    setIsSuccess(false); // Reset success status
+
     if (validate()) {
-      alert("Form submitted successfully!");
+      try {
+        // Using Axios for the POST request
+        const response = await axios.post("https://api.cyberfraudprotection.com/submit-form", formData, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.status >= 200 && response.status < 300) { // Check for successful HTTP status codes
+          console.log("Form submitted successfully:", response.data);
+          setSubmissionMessage("Form submitted successfully!");
+          setIsSuccess(true);
+          // Optionally reset form after successful submission
+          setFormData({
+            fullName: "",
+            email: "",
+            phoneNumber: "",
+            city: "",
+            contactAs: "",
+            helpType: "",
+            message: "",
+            preferredContact: "",
+            bestTime: "",
+          });
+          setErrors({}); // Clear errors on successful submission
+        } else {
+          // This block might not be reached with Axios for non-2xx responses if it throws an error
+          // Axios typically throws an error for non-2xx status codes, which will be caught below
+          console.error("Form submission failed with status:", response.status, response.data);
+          setSubmissionMessage(`Submission failed: ${response.data?.message || response.statusText || 'Unknown error'}`);
+          setIsSuccess(false);
+        }
+      } catch (error: any) { // Type 'any' for error to handle AxiosError
+        if (axios.isAxiosError(error)) {
+          // Axios-specific error handling
+          console.error("Axios error submitting form:", error.response?.data || error.message);
+          setSubmissionMessage(`Submission failed: ${error.response?.data?.message || error.message}`);
+        } else {
+          // General error handling
+          console.error("Error submitting form:", error);
+          setSubmissionMessage("An unexpected error occurred. Please try again.");
+        }
+        setIsSuccess(false);
+      }
     }
   };
 
@@ -167,16 +216,16 @@ const ContactUs = () => {
 
             <Row>
               <InputGroup>
-                <Label htmlFor="phone">Phone Number *</Label>
+                <Label htmlFor="phoneNumber">Phone Number *</Label>
                 <Input
-                  id="phone"
+                  id="phoneNumber"
                   type="text"
                   placeholder="Phone Number"
-                  name="phone"
-                  value={formData.phone}
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
                   onChange={handleChange}
                 />
-                {errors.phone && <Error>{errors.phone}</Error>}
+                {errors.phoneNumber && <Error>{errors.phoneNumber}</Error>}
               </InputGroup>
 
               <InputGroup>
@@ -209,11 +258,11 @@ const ContactUs = () => {
             </Row>
             {errors.contactAs && <Error>{errors.contactAs}</Error>}
 
-            <Label htmlFor="contactType">How can we help you?</Label>
+            <Label htmlFor="helpType">How can we help you?</Label>
             <CustomSelect
-              id="contactType"
-              name="contactType"
-              value={formData.contactType}
+              id="helpType"
+              name="helpType"
+              value={formData.helpType}
               onChange={handleChange}
             >
               <option value="">Select Type</option>
@@ -224,7 +273,7 @@ const ContactUs = () => {
               <option value="Insurance">Insurance Assistance</option>
               <option value="Other">Other</option>
             </CustomSelect>
-            {errors.contactType && <Error>{errors.contactType}</Error>}
+            {errors.helpType && <Error>{errors.helpType}</Error>}
 
             <InputGroup>
               <Label htmlFor="message">Message *</Label>
@@ -244,7 +293,7 @@ const ContactUs = () => {
                 <RadioLabel key={mode}>
                   <CustomRadio
                     type="radio"
-                    name="preferredMode"
+                    name="preferredContact"
                     value={mode}
                     onChange={handleChange}
                   />
@@ -252,7 +301,7 @@ const ContactUs = () => {
                 </RadioLabel>
               ))}
             </Row>
-            {errors.preferredMode && <Error>{errors.preferredMode}</Error>}
+            {errors.preferredContact && <Error>{errors.preferredContact}</Error>}
 
             <Label htmlFor="bestTime">Best Time to Reach You</Label>
             <CustomSelect
@@ -270,6 +319,12 @@ const ContactUs = () => {
             {errors.bestTime && <Error>{errors.bestTime}</Error>}
 
             <SubmitBtn type="submit">Submit</SubmitBtn>
+
+            {submissionMessage && (
+              <p style={{ color: isSuccess ? 'green' : 'red', marginTop: '10px', textAlign: 'center' }}>
+                {submissionMessage}
+              </p>
+            )}
           </Form>
         </RightPanel>
       </motion.div>
