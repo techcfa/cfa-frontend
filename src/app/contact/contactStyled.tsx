@@ -187,3 +187,19 @@ export const SubmitBtn = styled.button`
     background: #004099;
   }
 `;
+
+export const ErrorText = styled.span`
+  color: #ff4d4f;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+`;
+
+export const StatusMessage = styled.div`
+  padding: 12px 16px;
+  margin: 16px 0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: 0.3s ease all;
+`;

@@ -22,14 +22,14 @@ import {
   Textarea,
   RadioLabel,
   Label,
-  Error,
   SubmitBtn,
   CustomRadio,
   CustomSelect,
+  ErrorText,
+  StatusMessage,
 } from "./contactStyled";
 
 import { MdEmail, MdLocationOn, MdPhone } from "react-icons/md";
-
 import { motion, useInView } from "framer-motion";
 
 const ContactUs = () => {
@@ -46,9 +46,14 @@ const ContactUs = () => {
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors((prev) => ({ ...prev, [e.target.name]: "" }));
+    setStatusMessage(null);
   };
 
   const validate = () => {
@@ -67,10 +72,37 @@ const ContactUs = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validate()) {
-      alert("Form submitted successfully!");
+
+    if (!validate()) return;
+
+    try {
+      const response = await fetch("https://api.cyberfraudprotection.com", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        setStatusMessage("Thank you! Your message has been successfully submitted.");
+        setFormData({
+          fullName: "",
+          email: "",
+          phone: "",
+          city: "",
+          contactAs: "",
+          contactType: "",
+          message: "",
+          preferredMode: "",
+          bestTime: "",
+        });
+      } else {
+        const data = await response.json();
+        setStatusMessage(data.message || "Something went wrong. Please try again later.");
+      }
+    } catch (error) {
+      setStatusMessage("Network error. Please try again later.");
     }
   };
 
@@ -95,21 +127,20 @@ const ContactUs = () => {
 
           <InfoBlock>
             <InfoTitle><MdEmail /> Email:</InfoTitle>
-            <InfoText as='a' href="mailto: support@cyberfraudprotection.com" >support@cyberfraudprotection.com</InfoText>
+            <InfoText as='a' href="mailto:support@cyberfraudprotection.com">support@cyberfraudprotection.com</InfoText>
           </InfoBlock>
 
           <InfoBlock>
             <InfoTitle><MdLocationOn /> Office Address:</InfoTitle>
-            <InfoText>no. 21, 7th Cross, C T Bed Road, Banashankari 2nd Stage, Bangalore 560070</InfoText>
+            <InfoText>No. 21, 7th Cross, C T Bed Road, Banashankari 2nd Stage, Bangalore 560070</InfoText>
           </InfoBlock>
 
           <InfoBlock>
             <InfoTitle><MdPhone /> Phone:</InfoTitle>
             <InfoText>
-             <BlueText as="a" href="tel:+917044432779" style={{ fontWeight: "bold", textDecoration: "none" }}>
-              7044432779
+              <BlueText as="a" href="tel:+917044432779" style={{ fontWeight: "bold", textDecoration: "none" }}>
+                7044432779
               </BlueText>
-
               <br />
               <small>
                 Available Tuesday–Sunday, 10 AM–7 PM <br />
@@ -134,62 +165,34 @@ const ContactUs = () => {
       >
         <RightPanel>
           <FormTitle>Get In Touch</FormTitle>
-          <FormSubtitle>
-            We're here to help! Please fill out the form below and our team will get back to you promptly.
-          </FormSubtitle>
+          <FormSubtitle>We're here to help! Please fill out the form below and our team will get back to you promptly.</FormSubtitle>
+
+          {statusMessage && <StatusMessage>{statusMessage}</StatusMessage>}
 
           <Form onSubmit={handleSubmit}>
             <InputGroup>
               <Label htmlFor="fullName">Full Name *</Label>
-              <Input
-                id="fullName"
-                type="text"
-                placeholder="Your full name"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-              />
-              {errors.fullName && <Error>{errors.fullName}</Error>}
+              <Input id="fullName" type="text" name="fullName" value={formData.fullName} onChange={handleChange} placeholder="Your full name" />
+              {errors.fullName && <ErrorText>{errors.fullName}</ErrorText>}
             </InputGroup>
 
             <InputGroup>
               <Label htmlFor="email">Email ID *</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Your email id"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-              {errors.email && <Error>{errors.email}</Error>}
+              <Input id="email" type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Your email id" />
+              {errors.email && <ErrorText>{errors.email}</ErrorText>}
             </InputGroup>
 
             <Row>
               <InputGroup>
                 <Label htmlFor="phone">Phone Number *</Label>
-                <Input
-                  id="phone"
-                  type="text"
-                  placeholder="Phone Number"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                />
-                {errors.phone && <Error>{errors.phone}</Error>}
+                <Input id="phone" type="text" name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone Number" />
+                {errors.phone && <ErrorText>{errors.phone}</ErrorText>}
               </InputGroup>
 
               <InputGroup>
                 <Label htmlFor="city">City *</Label>
-                <Input
-                  id="city"
-                  type="text"
-                  placeholder="Your City"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleChange}
-                />
-                {errors.city && <Error>{errors.city}</Error>}
+                <Input id="city" type="text" name="city" value={formData.city} onChange={handleChange} placeholder="Your City" />
+                {errors.city && <ErrorText>{errors.city}</ErrorText>}
               </InputGroup>
             </Row>
 
@@ -197,25 +200,15 @@ const ContactUs = () => {
             <Row>
               {["Individual", "Family/Group", "Corporate/Business"].map((type) => (
                 <RadioLabel key={type}>
-                  <CustomRadio
-                    type="radio"
-                    name="contactAs"
-                    value={type}
-                    onChange={handleChange}
-                  />
+                  <CustomRadio type="radio" name="contactAs" value={type} checked={formData.contactAs === type} onChange={handleChange} />
                   {type}
                 </RadioLabel>
               ))}
             </Row>
-            {errors.contactAs && <Error>{errors.contactAs}</Error>}
+            {errors.contactAs && <ErrorText>{errors.contactAs}</ErrorText>}
 
             <Label htmlFor="contactType">How can we help you?</Label>
-            <CustomSelect
-              id="contactType"
-              name="contactType"
-              value={formData.contactType}
-              onChange={handleChange}
-            >
+            <CustomSelect id="contactType" name="contactType" value={formData.contactType} onChange={handleChange}>
               <option value="">Select Type</option>
               <option value="Query">General Inquiry</option>
               <option value="Support">Subscription Information</option>
@@ -224,50 +217,34 @@ const ContactUs = () => {
               <option value="Insurance">Insurance Assistance</option>
               <option value="Other">Other</option>
             </CustomSelect>
-            {errors.contactType && <Error>{errors.contactType}</Error>}
+            {errors.contactType && <ErrorText>{errors.contactType}</ErrorText>}
 
             <InputGroup>
               <Label htmlFor="message">Message *</Label>
-              <Textarea
-                id="message"
-                placeholder="Write a message!"
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-              />
-              {errors.message && <Error>{errors.message}</Error>}
+              <Textarea id="message" name="message" value={formData.message} onChange={handleChange} placeholder="Write a message!" />
+              {errors.message && <ErrorText>{errors.message}</ErrorText>}
             </InputGroup>
 
             <Label>Preferred Mode of Contact</Label>
             <Row>
               {["Email", "Phone", "WhatsApp"].map((mode) => (
                 <RadioLabel key={mode}>
-                  <CustomRadio
-                    type="radio"
-                    name="preferredMode"
-                    value={mode}
-                    onChange={handleChange}
-                  />
+                  <CustomRadio type="radio" name="preferredMode" value={mode} checked={formData.preferredMode === mode} onChange={handleChange} />
                   {mode}
                 </RadioLabel>
               ))}
             </Row>
-            {errors.preferredMode && <Error>{errors.preferredMode}</Error>}
+            {errors.preferredMode && <ErrorText>{errors.preferredMode}</ErrorText>}
 
             <Label htmlFor="bestTime">Best Time to Reach You</Label>
-            <CustomSelect
-              id="bestTime"
-              name="bestTime"
-              value={formData.bestTime}
-              onChange={handleChange}
-            >
+            <CustomSelect id="bestTime" name="bestTime" value={formData.bestTime} onChange={handleChange}>
               <option value="">Select Best Time</option>
               <option value="Morning">Morning</option>
               <option value="Afternoon">Afternoon</option>
               <option value="Evening">Evening</option>
               <option value="Anytime">Anytime</option>
             </CustomSelect>
-            {errors.bestTime && <Error>{errors.bestTime}</Error>}
+            {errors.bestTime && <ErrorText>{errors.bestTime}</ErrorText>}
 
             <SubmitBtn type="submit">Submit</SubmitBtn>
           </Form>
