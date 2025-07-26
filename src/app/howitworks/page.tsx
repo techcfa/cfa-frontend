@@ -34,7 +34,7 @@ export default function HowItWorksPage() {
       title: "24/7 Helpline",
       description: (
         <>
-          <strong>+91 7044432779</strong> — Save it now. Call us anytime you need help.
+          <strong>You will be provided 24/7 Helpline Number</strong> immediately on subscription
         </>
       ),
     },
