@@ -72,7 +72,7 @@ const Navbar = () => {
         <NavItem>
             <ContactButton>
               <img src="/callnow.png" alt="Call Icon" />
-              Call Now
+              +91 7044432779
             </ContactButton>
         </NavItem>
       </NavList>
@@ -97,7 +97,7 @@ const Navbar = () => {
           <a href={`tel:${7044432779}`}>
             <ContactButton>
               <img src="/callnow.png" alt="Call Icon" />
-              Call Now
+              +91 7044432779
             </ContactButton>
           </a>
         </NavItem>
