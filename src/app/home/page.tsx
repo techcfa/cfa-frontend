@@ -67,12 +67,19 @@ const Overlay = styled.div`
 const Content = styled.div`
   position: relative;
   max-width: 800px;
+  width: 100%;
   text-align: left;
   color: white;
   z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  word-break: break-word;
+  overflow-wrap: break-word;
+
+  @media (max-width: 1024px) {
+    max-width: 100%;
+  }
 `;
 
 const Title = styled.h1`
@@ -81,6 +88,8 @@ const Title = styled.h1`
   font-weight: bold;
   color: #fff;
   line-height: 1.2;
+  max-width: 100%;
+  word-break: break-word;
 
   @media (max-width: 1024px) {
     font-size: 2.4rem;
@@ -96,6 +105,8 @@ const Subtitle = styled.p`
   font-size: 1.2rem;
   font-family: "Lato", sans-serif;
   color: #dcdcdc;
+  max-width: 100%;
+  word-break: break-word;
 
   @media (max-width: 768px) {
     font-size: 0.95rem;
@@ -107,8 +118,13 @@ const USP = styled.p`
   font-size: 1.1rem;
   font-weight: 500;
   margin-top: 20px;
-  max-width: 700px;
   line-height: 1.4;
+  max-width: 100%;
+  word-break: break-word;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
 `;
 
 const Price = styled.p`
@@ -177,7 +193,6 @@ const HomeSection: React.FC = () => {
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
-  // 🔁 Autoplay logic
   useEffect(() => {
     const interval = setInterval(() => {
       setCarouselIndex((prev) => (prev + 1) % 2);
