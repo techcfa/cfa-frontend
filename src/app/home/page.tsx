@@ -6,9 +6,7 @@ import { motion, useInView } from "framer-motion";
 
 // Styled Components
 const Section = styled.section`
-  position: relative;
-  width: 100%;
-  min-height: 90vh;
+         >min-height: 90vh;
   padding: 3rem 150px;
   display: flex;
   align-items: center;
@@ -222,10 +220,6 @@ const HomeSection: React.FC = () => {
           }}
         >
 
-          Complete support— from complaint to recovery, insurance claims,
-          and even court battles if needed.
-        </Subtitle>
-
         <USP
           as={motion.p}
           initial={{ opacity: 0, y: 30 }}
@@ -239,39 +233,9 @@ const HomeSection: React.FC = () => {
           </strong>
         </USP>
 
-        <Price
-          as={motion.p}
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.6, duration: 1 }}
-        >
-          Starting at just ₹ 300/month per person
-        </Price>
 
-        <ButtonContainer>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.8, duration: 1 }}
-            onClick={() => window.location.href = '/auth/signup'}
-            style={{
-              padding: "12px 24px",
-              background: "#007bff",
-              color: "#fff",
-              border: "none",
-              borderRadius: "6px",
-              fontSize: "16px",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            Get Started
-          </motion.button>
-        </ButtonContainer>
-      </Content>
-=======
+
+
           {/* Slide 1 */}
           <CarouselSlide>
             <Content
