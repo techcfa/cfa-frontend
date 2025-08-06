@@ -221,6 +221,57 @@ const HomeSection: React.FC = () => {
             else if (info.offset.x > 80) handleSwipe(-1);
           }}
         >
+
+          Complete support— from complaint to recovery, insurance claims,
+          and even court battles if needed.
+        </Subtitle>
+
+        <USP
+          as={motion.p}
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.5, duration: 1 }}
+        >
+          <strong>
+            If your insurance claim is rejected, we’ll file and fight your case
+            in Consumer Court — at <u>NO extra fee</u>. Court case fee is included
+            in your subscription.
+          </strong>
+        </USP>
+
+        <Price
+          as={motion.p}
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.6, duration: 1 }}
+        >
+          Starting at just ₹ 300/month per person
+        </Price>
+
+        <ButtonContainer>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.8, duration: 1 }}
+            onClick={() => window.location.href = '/auth/signup'}
+            style={{
+              padding: "12px 24px",
+              background: "#007bff",
+              color: "#fff",
+              border: "none",
+              borderRadius: "6px",
+              fontSize: "16px",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            Get Started
+          </motion.button>
+        </ButtonContainer>
+      </Content>
+=======
           {/* Slide 1 */}
           <CarouselSlide>
             <Content
@@ -289,6 +340,7 @@ const HomeSection: React.FC = () => {
           />
         ))}
       </DotsContainer>
+
     </Section>
   );
 };

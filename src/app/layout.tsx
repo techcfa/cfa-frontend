@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Montserrat, Lato, Poppins, Nunito_Sans } from "next/font/google";
 import "./globals.css";
 import StyledComponentsRegistry from "./Registry";
+import { AuthProvider } from "./contexts/AuthContext";
 import Navbar from "../../src/app/Components/Navbar";
 import Footer from "../../src/app/Components/Footer";
 
@@ -62,11 +63,13 @@ export default function RootLayout({
         style={{ overflowX: "hidden" }} // Prevents horizontal scroll
       >
         <StyledComponentsRegistry>
-          <Navbar />
-          <main className="flex-1">
-            {children}
-          </main>
-          <Footer />
+          <AuthProvider>
+            <Navbar />
+            <main className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </AuthProvider>
         </StyledComponentsRegistry>
       </body>
     </html>

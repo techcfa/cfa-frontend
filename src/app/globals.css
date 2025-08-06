@@ -48,3 +48,17 @@ body {
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
+/* Ensure input styling works properly */
+input, textarea, select {
+  font-family: inherit !important;
+}
+
+/* Font declarations for better fallback */
+.font-montserrat {
+  font-family: 'Montserrat', sans-serif !important;
+}
+
+.font-lato {
+  font-family: 'Lato', sans-serif !important;
+}
