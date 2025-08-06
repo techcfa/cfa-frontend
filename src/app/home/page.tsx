@@ -88,7 +88,7 @@ const HomeSection: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.8, duration: 1 }}
-            onClick={() => handleScrollToSection("contact")}
+            onClick={() => window.location.href = '/auth/signup'}
             style={{
               padding: "12px 24px",
               background: "#007bff",
@@ -100,7 +100,7 @@ const HomeSection: React.FC = () => {
               cursor: "pointer",
             }}
           >
-            Subscribe Now
+            Get Started
           </motion.button>
         </ButtonContainer>
       </Content>
