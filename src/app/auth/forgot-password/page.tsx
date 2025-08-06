@@ -1,390 +1,252 @@
 "use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { authService } from '../../services/authService';
-import { Eye, EyeOff, Phone, Lock, ArrowLeft, Shield, CheckCircle, AlertCircle } from 'lucide-react';
-import StyledInput from '../../Components/StyledInput';
-import StyledButton from '../../Components/StyledButton';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { Eye, EyeOff, Phone, Lock, ArrowLeft, Shield } from "lucide-react";
+import { authService } from "../../services/authService";
+import * as S from "./ForgotPasswordStyles";
 
-const ForgotPasswordPage = () => {
+// Inline Step UI
+const StepIndicator = ({ current }: { current: "mobile" | "otp" | "reset" }) => {
+  const steps = [
+    { key: "mobile", label: "Mobile" },
+    { key: "otp", label: "OTP" },
+    { key: "reset", label: "Reset" },
+  ];
+
+  const stepIndex = steps.findIndex((s) => s.key === current);
+
+  return (
+    <S.StepWrapper>
+      {steps.map((step, index) => (
+        <React.Fragment key={step.key}>
+          <S.StepCircle active={stepIndex >= index}>{index + 1}</S.StepCircle>
+          <S.StepLabel active={stepIndex >= index}>{step.label}</S.StepLabel>
+          {index < steps.length - 1 && (
+            <S.StepLine active={stepIndex > index} />
+          )}
+        </React.Fragment>
+      ))}
+    </S.StepWrapper>
+  );
+};
+
+const ForgotPasswordPage: React.FC = () => {
   const router = useRouter();
-  
-  const [step, setStep] = useState<'mobile' | 'otp' | 'reset'>('mobile');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  
-  // Form data
-  const [mobileNumber, setMobileNumber] = useState('');
-  const [otp, setOtp] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [step, setStep] = useState<"mobile" | "otp" | "reset">("mobile");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [otp, setOtp] = useState("");
+  const [newPwd, setNewPwd] = useState("");
+  const [confirmPwd, setConfirmPwd] = useState("");
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [count, setCount] = useState(0);
 
-  // OTP countdown
-  const [otpCountdown, setOtpCountdown] = useState(0);
-
-  const startOtpCountdown = () => {
-    setOtpCountdown(60);
-    const interval = setInterval(() => {
-      setOtpCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
+  const startCount = () => {
+    setCount(60);
+    const iv = setInterval(() => {
+      setCount((c) => {
+        if (c <= 1) {
+          clearInterval(iv);
           return 0;
         }
-        return prev - 1;
+        return c - 1;
       });
     }, 1000);
   };
 
-  const handleSendOTP = async () => {
-    if (!mobileNumber || mobileNumber.length !== 10) {
-      setError('Please enter a valid 10-digit mobile number');
+  const sendOTP = async () => {
+    if (mobile.length !== 10) {
+      setError("Enter valid 10-digit mobile");
       return;
     }
-
-    setIsLoading(true);
-    setError('');
-    setSuccess('');
-
+    setLoading(true);
+    setError("");
+    setSuccess("");
     try {
-      await authService.forgotPassword({ mobileNumber });
-      setSuccess('OTP sent successfully!');
-      setStep('otp');
-      startOtpCountdown();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to send OTP. Please try again.');
+      await authService.forgotPassword({ mobileNumber: mobile });
+      setSuccess("OTP sent successfully");
+      setStep("otp");
+      startCount();
+    } catch (e: any) {
+      setError(e.response?.data?.message || "Failed to send OTP");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const handleVerifyOTP = async () => {
-    if (!otp || otp.length !== 6) {
-      setError('Please enter a valid 6-digit OTP');
+  const verifyOTP = () => {
+    if (otp.length !== 6) {
+      setError("Enter valid 6-digit OTP");
       return;
     }
-
-    setIsLoading(true);
-    setError('');
-
-    try {
-      // For demo purposes, we'll just move to the reset step
-      // In a real implementation, you might want to verify the OTP first
-      setStep('reset');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Invalid OTP. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    setStep("reset");
   };
 
-  const handleResetPassword = async () => {
-    if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters long');
+  const resetPassword = async () => {
+    if (newPwd.length < 6) {
+      setError("Password too short");
       return;
     }
-
-    if (newPassword !== confirmPassword) {
-      setError('Passwords do not match');
+    if (newPwd !== confirmPwd) {
+      setError("Passwords do not match");
       return;
     }
-
-    setIsLoading(true);
-    setError('');
-
+    setLoading(true);
+    setError("");
+    setSuccess("");
     try {
-      await authService.resetPassword({
-        mobileNumber,
-        otp,
-        newPassword
-      });
-
-      setSuccess('Password reset successfully! Redirecting to login...');
-      
-      setTimeout(() => {
-        router.push('/auth/signin');
-      }, 2000);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Password reset failed. Please try again.');
+      await authService.resetPassword({ mobileNumber: mobile, otp, newPassword: newPwd });
+      setSuccess("Password reset! Redirecting...");
+      setTimeout(() => router.push("/auth/signin"), 1500);
+    } catch (e: any) {
+      setError(e.response?.data?.message || "Reset failed");
     } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const resendOTP = async () => {
-    if (otpCountdown > 0) return;
-    
-    setIsLoading(true);
-    setError('');
-
-    try {
-      await authService.forgotPassword({ mobileNumber });
-      setSuccess('OTP resent successfully!');
-      startOtpCountdown();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to resend OTP. Please try again.');
-    } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Background with same styling as home page */}
-      <div className="absolute inset-0">
-        <img 
-          src="/BG.png" 
-          alt="Background" 
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/60"></div>
-      </div>
-      
-      {/* Additional background patterns for depth */}
-      <div className="absolute top-0 left-0 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
-      
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
-          {/* Back Button */}
-          <Link 
-            href="/auth/signin" 
-            className="inline-flex items-center text-white/90 hover:text-white mb-6 transition-colors group"
-          >
-            <ArrowLeft size={20} className="mr-2 group-hover:-translate-x-1 transition-transform" />
-            <span className="font-medium font-['Lato']">Back to Sign In</span>
-          </Link>
+    <S.PageContainer>
+      <S.Background />
+      <S.GlowBlue />
+      <S.GlowPurple />
+      <S.Content>
+        <S.BackLink href="/auth/signin">
+          <ArrowLeft size={18} /> Back to Sign In
+        </S.BackLink>
 
-          {/* Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/20"
-          >
-            {/* Header */}
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mb-4 shadow-lg">
-                <Shield className="text-white" size={28} />
-              </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2 font-['Montserrat']">Reset Password</h1>
-              <p className="text-gray-600 font-['Lato']">
-                {step === 'mobile' && 'Enter your mobile number to receive a reset code'}
-                {step === 'otp' && 'Enter the OTP sent to your mobile'}
-                {step === 'reset' && 'Create your new password'}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <S.Card>
+
+            {/* Inline Step Indicator */}
+            <StepIndicator current={step} />
+
+            <S.Header>
+              <S.IconCircle>
+                <Shield size={24} />
+              </S.IconCircle>
+              <h1>Reset Password</h1>
+              <p>
+                {step === "mobile"
+                  ? "Enter your mobile number to receive a code."
+                  : step === "otp"
+                  ? "Enter the OTP sent to your mobile."
+                  : "Create your new password."}
               </p>
-            </div>
+            </S.Header>
 
-            {/* Progress Steps */}
-            <div className="flex items-center justify-center mb-8">
-              <div className="flex items-center">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
-                  step === 'mobile' 
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg' 
-                    : step === 'otp' || step === 'reset'
-                    ? 'bg-green-500 text-white shadow-lg'
-                    : 'bg-gray-200 text-gray-600'
-                }`}>
-                  {step === 'mobile' ? '1' : <CheckCircle size={16} />}
-                </div>
-                <div className={`w-16 h-1 mx-3 transition-all duration-300 ${
-                  step !== 'mobile' ? 'bg-gradient-to-r from-green-500 to-blue-500' : 'bg-gray-200'
-                }`}></div>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
-                  step === 'otp' 
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg' 
-                    : step === 'reset'
-                    ? 'bg-green-500 text-white shadow-lg'
-                    : 'bg-gray-200 text-gray-600'
-                }`}>
-                  {step === 'otp' ? '2' : step === 'reset' ? <CheckCircle size={16} /> : '2'}
-                </div>
-                <div className={`w-16 h-1 mx-3 transition-all duration-300 ${
-                  step === 'reset' ? 'bg-gradient-to-r from-green-500 to-blue-500' : 'bg-gray-200'
-                }`}></div>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
-                  step === 'reset' 
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg' 
-                    : 'bg-gray-200 text-gray-600'
-                }`}>
-                  3
-                </div>
-              </div>
-            </div>
+            {error && <S.Alert type="error">{error}</S.Alert>}
+            {success && <S.Alert type="success">{success}</S.Alert>}
 
-            {/* Error/Success Messages */}
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 flex items-center"
-              >
-                <AlertCircle size={20} className="mr-3 text-red-500" />
-                {error}
-              </motion.div>
+            {/* Mobile Step */}
+            {step === "mobile" && (
+              <S.Form>
+                <S.Field>
+                  <label>Mobile Number</label>
+                  <S.InputIcon>
+                    <Phone size={18} />
+                    <input
+                      type="tel"
+                      value={mobile}
+                      onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                      placeholder="Enter mobile number"
+                      maxLength={10}
+                    />
+                  </S.InputIcon>
+                </S.Field>
+                <S.Button disabled={mobile.length !== 10 || loading} onClick={sendOTP}>
+                  {loading ? "Sending..." : "Send OTP"}
+                </S.Button>
+              </S.Form>
             )}
 
-            {success && (
-              <motion.div
-                initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 flex items-center"
-              >
-                <CheckCircle size={20} className="mr-3 text-green-500" />
-                {success}
-              </motion.div>
+            {/* OTP Step */}
+            {step === "otp" && (
+              <S.Form>
+                <S.Field>
+                  <label>OTP Code</label>
+                  <S.InputIcon>
+                    <input
+                      type="text"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                      placeholder="Enter 6‑digit OTP"
+                      maxLength={6}
+                    />
+                  </S.InputIcon>
+                </S.Field>
+                <S.Row>
+                  <S.Button disabled={otp.length !== 6 || loading} onClick={verifyOTP}>
+                    Verify
+                  </S.Button>
+                  <S.Button variant="outline" disabled={count > 0} onClick={sendOTP}>
+                    {count > 0 ? `${count}s` : "Resend"}
+                  </S.Button>
+                </S.Row>
+                <S.Button variant="ghost" onClick={() => setStep("mobile")}>
+                  ← Back
+                </S.Button>
+              </S.Form>
             )}
 
-            {/* Step 1: Mobile Number */}
-            {step === 'mobile' && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-6"
-              >
-                <StyledInput
-                  type="tel"
-                  label="Mobile Number"
-                  value={mobileNumber}
-                  onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                  placeholder="Enter your mobile number"
-                  icon={Phone}
-                  maxLength={10}
-                  autoComplete="tel"
-                />
+            {/* Reset Step */}
+            {step === "reset" && (
+              <S.Form>
+                <S.Field>
+                  <label>New Password</label>
+                  <S.InputIcon>
+                    <Lock size={18} />
+                    <input
+                      type={showNew ? "text" : "password"}
+                      value={newPwd}
+                      onChange={(e) => setNewPwd(e.target.value)}
+                      placeholder="Enter new password"
+                    />
+                    <span onClick={() => setShowNew(!showNew)}>
+                      {showNew ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </span>
+                  </S.InputIcon>
+                </S.Field>
 
-                <StyledButton
-                  onClick={handleSendOTP}
-                  disabled={mobileNumber.length !== 10}
-                  loading={isLoading}
-                  loadingText="Sending OTP..."
-                  fullWidth
-                >
-                  Send Reset Code
-                </StyledButton>
-              </motion.div>
+                <S.Field>
+                  <label>Confirm Password</label>
+                  <S.InputIcon>
+                    <Lock size={18} />
+                    <input
+                      type={showConfirm ? "text" : "password"}
+                      value={confirmPwd}
+                      onChange={(e) => setConfirmPwd(e.target.value)}
+                      placeholder="Confirm password"
+                    />
+                    <span onClick={() => setShowConfirm(!showConfirm)}>
+                      {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </span>
+                  </S.InputIcon>
+                </S.Field>
+
+                <S.Button disabled={loading} onClick={resetPassword}>
+                  {loading ? "Resetting..." : "Reset Password"}
+                </S.Button>
+                <S.Button variant="ghost" onClick={() => setStep("otp")}>
+                  ← Back
+                </S.Button>
+              </S.Form>
             )}
 
-            {/* Step 2: OTP Verification */}
-            {step === 'otp' && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-6"
-              >
-                <StyledInput
-                  type="text"
-                  label={`Enter OTP sent to ${mobileNumber}`}
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  placeholder="Enter 6-digit OTP"
-                  maxLength={6}
-                  autoComplete="one-time-code"
-                />
-
-                <div className="flex space-x-4">
-                  <StyledButton
-                    onClick={handleVerifyOTP}
-                    disabled={otp.length !== 6}
-                    loading={isLoading}
-                    loadingText="Verifying..."
-                    variant="primary"
-                    className="flex-1"
-                  >
-                    Verify OTP
-                  </StyledButton>
-                  <StyledButton
-                    onClick={resendOTP}
-                    disabled={otpCountdown > 0}
-                    variant="outline"
-                    size="md"
-                  >
-                    {otpCountdown > 0 ? `${otpCountdown}s` : 'Resend'}
-                  </StyledButton>
-                </div>
-
-                <StyledButton
-                  onClick={() => setStep('mobile')}
-                  variant="ghost"
-                  fullWidth
-                >
-                  ← Back to mobile number
-                </StyledButton>
-              </motion.div>
-            )}
-
-            {/* Step 3: Reset Password */}
-            {step === 'reset' && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-6"
-              >
-                <StyledInput
-                  type={showPassword ? 'text' : 'password'}
-                  label="New Password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Enter new password"
-                  icon={Lock}
-                  rightIcon={showPassword ? EyeOff : Eye}
-                  onRightIconClick={() => setShowPassword(!showPassword)}
-                  autoComplete="new-password"
-                />
-
-                <StyledInput
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  label="Confirm New Password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Confirm new password"
-                  icon={Lock}
-                  rightIcon={showConfirmPassword ? EyeOff : Eye}
-                  onRightIconClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  autoComplete="new-password"
-                />
-
-                <StyledButton
-                  onClick={handleResetPassword}
-                  loading={isLoading}
-                  loadingText="Resetting Password..."
-                  fullWidth
-                >
-                  Reset Password
-                </StyledButton>
-
-                <StyledButton
-                  onClick={() => setStep('otp')}
-                  variant="ghost"
-                  fullWidth
-                >
-                  ← Back to OTP verification
-                </StyledButton>
-              </motion.div>
-            )}
-
-            {/* Footer */}
-            <div className="mt-8 text-center">
-              <p className="text-gray-600 font-['Lato']">
-                Remember your password?{' '}
-                <Link href="/auth/signin" className="text-blue-600 hover:text-blue-700 font-semibold transition-colors">
-                  Sign In
-                </Link>
-              </p>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-    </div>
+            <S.FootNote>
+              Remembered your password? <Link href="/auth/signin"><span>Sign In</span></Link>
+            </S.FootNote>
+          </S.Card>
+        </motion.div>
+      </S.Content>
+    </S.PageContainer>
   );
 };
 
-export default ForgotPasswordPage; 
+export default ForgotPasswordPage;
