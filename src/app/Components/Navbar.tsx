@@ -34,8 +34,6 @@ const Navbar = () => {
     { id: "plans", label: "Subscription Plans" },
   ];
 
-  const phoneNumber = "+911234567890"; // Replace with your phone number
-
   return (
     <Nav>
       <LogoContainer>
@@ -107,12 +105,10 @@ const Navbar = () => {
           </>
         )}
         <NavItem>
-          <a href={`tel:+91${7044432779}`}>
             <ContactButton>
               <img src="/callnow.png" alt="Call Icon" />
-              Call Now
+              +91 7044432779
             </ContactButton>
-          </a>
         </NavItem>
       </NavList>
 
@@ -168,7 +164,7 @@ const Navbar = () => {
           <a href={`tel:${7044432779}`}>
             <ContactButton>
               <img src="/callnow.png" alt="Call Icon" />
-              Call Now
+              +91 7044432779
             </ContactButton>
           </a>
         </NavItem>
