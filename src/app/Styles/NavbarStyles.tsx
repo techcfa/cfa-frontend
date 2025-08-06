@@ -1,33 +1,35 @@
 import styled from "styled-components";
 
+// ========== NAVIGATION ========== //
 export const Nav = styled.nav`
   width: 100%;
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  height: 80px;
+  height: 72px;
   z-index: 1000;
   background: white;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 30px 150px;
-  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px 120px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05);
 
   @media (max-width: 1200px) {
-    padding: 20px 80px;
+    padding: 16px 80px;
   }
 
   @media (max-width: 992px) {
-    padding: 20px 40px;
+    padding: 14px 40px;
   }
 
   @media (max-width: 576px) {
-    padding: 20px 20px;
+    padding: 12px 16px;
+    height: 64px;
   }
 `;
 
+// ========== LOGO ========== //
 export const LogoContainer = styled.div`
   display: flex;
   align-items: center;
@@ -41,19 +43,20 @@ export const LogoContainer = styled.div`
     }
 
     @media (max-width: 480px) {
-      max-height: 30px;
+      max-height: 28px;
     }
   }
 `;
 
+// ========== NAV ITEMS ========== //
 export const NavList = styled.ul`
   display: flex;
-  gap: 32px;
+  gap: 28px;
   list-style: none;
   align-items: center;
 
   @media (max-width: 992px) {
-    gap: 24px;
+    gap: 20px;
   }
 
   @media (max-width: 768px) {
@@ -64,31 +67,36 @@ export const NavList = styled.ul`
 export const NavItem = styled.li`
   a {
     text-decoration: none;
-    color: black;
-    font-size: 16px;
+    color: #111;
+    font-size: 15px;
     font-family: "Montserrat", sans-serif;
     font-weight: 600;
     cursor: pointer;
-    transition: color 0.3s ease-in-out;
+    transition: color 0.3s ease;
 
     &:hover {
-      color: #0073D7;
+      color: #2563eb;
     }
 
     @media (max-width: 992px) {
-      font-size: 15px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 576px) {
+      font-size: 13px;
     }
   }
 `;
 
+// ========== CONTACT BUTTON ========== //
 export const ContactButton = styled.button`
-  background-color: #0073D7;
+  background-color: #2563eb;
   color: white;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   border: none;
-  padding: 10px 14px;
-  border-radius: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
   cursor: pointer;
   font-family: "Montserrat", sans-serif;
   display: inline-flex;
@@ -97,48 +105,48 @@ export const ContactButton = styled.button`
   transition: background-color 0.3s ease;
 
   img {
-    width: 26px;
-    height: 26px;
+    width: 20px;
+    height: 20px;
   }
 
   &:hover {
-    background-color: #007bff;
+    background-color: #1e40af;
   }
 
   @media (max-width: 992px) {
-    font-size: 14px;
-    padding: 10px 14px;
+    font-size: 13px;
+    padding: 8px 12px;
   }
 
   @media (max-width: 768px) {
-    text-transform: uppercase;
-    font-size: 13px;
-    font-weight: bold;
-    gap: 8px;
+    font-size: 12.5px;
+    padding: 8px 10px;
+    gap: 4px;
   }
 
-  @media (max-width: 576px) {
+  @media (max-width: 480px) {
     font-size: 12px;
-    padding: 10px 14px;
+    padding: 6px 8px;
   }
 `;
 
+// ========== MOBILE MENU ========== //
 export const MobileMenu = styled.ul`
   position: fixed;
   top: 0;
   left: -100%;
-  width: 70%;
-  max-width: 300px;
+  width: 75%;
+  max-width: 320px;
   height: 100vh;
-  background: #fff;
+  background: white;
   backdrop-filter: blur(8px);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
-  padding: 100px 20px;
-  transition: 0.3s ease-in-out;
-  box-shadow: 5px 0 10px rgba(0, 0, 0, 0.1);
+  padding: 80px 20px;
+  transition: left 0.3s ease-in-out;
+  box-shadow: 5px 0 10px rgba(0, 0, 0, 0.08);
   list-style: none;
   z-index: 999;
 
@@ -153,21 +161,20 @@ export const MobileMenu = styled.ul`
   ${NavItem} {
     width: 100%;
     text-align: center;
-    padding: 12px 0;
+    padding: 10px 0;
 
     a {
-      font-size: 18px;
-      font-weight: bold;
-      color: black;
+      font-size: 16px;
+      font-weight: 600;
+      color: #111;
       text-transform: uppercase;
 
       @media (max-width: 576px) {
-        font-size: 16px;
+        font-size: 15px;
       }
     }
 
     .divider {
-      display: block;
       width: 80%;
       height: 1px;
       background-color: rgba(0, 0, 0, 0.2);
@@ -176,20 +183,21 @@ export const MobileMenu = styled.ul`
   }
 `;
 
+// ========== HAMBURGER ========== //
 export const HamburgerMenu = styled.div`
   display: none;
   cursor: pointer;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
   justify-content: center;
   align-items: center;
 
   div {
-    width: 28px;
-    height: 3px;
+    width: 24px;
+    height: 2px;
     background-color: black;
     transition: 0.3s;
-    border-radius: 5px;
+    border-radius: 3px;
   }
 
   &.open div:nth-child(1) {
@@ -206,5 +214,63 @@ export const HamburgerMenu = styled.div`
 
   @media (max-width: 768px) {
     display: flex;
+  }
+`;
+
+// ========== AUTH BUTTONS ========== //
+export const ActionsContainer = styled.div`
+  display: flex;
+  gap: 12px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
+export const StyledSignIn = styled.a`
+  background-color: transparent;
+  border: 2px solid #2563eb;
+  color: #2563eb;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.4px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 3px 10px rgba(37, 99, 235, 0.3);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 480px) {
+    padding: 6px 14px;
+    font-size: 0.85rem;
+  }
+`;
+
+export const StyledSignUp = styled.a`
+  background-color: #2563eb;
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.4px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+
+  &:hover {
+    background-color: #1e40af;
+    color: #ffffff;
+    box-shadow: 0 6px 16px rgba(30, 64, 175, 0.35);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 480px) {
+    padding: 6px 14px;
+    font-size: 0.85rem;
   }
 `;

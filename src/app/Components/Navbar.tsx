@@ -13,6 +13,9 @@ import {
   ContactButton,
   HamburgerMenu,
   MobileMenu,
+  StyledSignIn,
+  StyledSignUp,
+  ActionsContainer,
 } from "../Styles/NavbarStyles";
 
 const Navbar = () => {
@@ -23,7 +26,7 @@ const Navbar = () => {
     const section = document.getElementById(id);
     if (section) {
       section.scrollIntoView({ behavior: "smooth", block: "start" });
-      setMenuOpen(false); // Close mobile menu after clicking a link
+      setMenuOpen(false);
     }
   };
 
@@ -36,27 +39,28 @@ const Navbar = () => {
 
   return (
     <Nav>
+      {/* Logo */}
       <LogoContainer>
         <Link href="/" passHref>
           <Image
             src="/Logo.png"
             alt="Logo"
-            width={160}
-            height={80}
+            width={130}
+            height={60}
             priority
             style={{ cursor: "pointer" }}
           />
         </Link>
       </LogoContainer>
 
-      {/* Hamburger Icon */}
+      {/* Hamburger Menu */}
       <HamburgerMenu onClick={() => setMenuOpen(!menuOpen)}>
         <div className={menuOpen ? "open" : ""}></div>
         <div className={menuOpen ? "open" : ""}></div>
         <div className={menuOpen ? "open" : ""}></div>
       </HamburgerMenu>
 
-      {/* Desktop Navigation */}
+      {/* Desktop Menu */}
       <NavList className="desktop-menu">
         {navLinks.map(({ id, label }) => (
           <NavItem key={id}>
@@ -75,44 +79,40 @@ const Navbar = () => {
         {isAuthenticated ? (
           <>
             <NavItem>
-              <Link href="/dashboard" className="flex items-center text-gray-700 hover:text-blue-600 transition-colors">
-                <User size={20} className="mr-2" />
-                {user?.fullName || 'Dashboard'}
+              <Link
+                href="/dashboard"
+                className="flex items-center text-gray-700 hover:text-blue-600 transition-colors text-sm"
+              >
+                <User size={18} className="mr-1" />
+                {user?.fullName || "Dashboard"}
               </Link>
             </NavItem>
             <NavItem>
               <button
                 onClick={logout}
-                className="flex items-center text-gray-700 hover:text-red-600 transition-colors"
+                className="flex items-center text-gray-700 hover:text-red-600 transition-colors text-sm"
               >
-                <LogOut size={20} className="mr-2" />
+                <LogOut size={18} className="mr-1" />
                 Logout
               </button>
             </NavItem>
           </>
         ) : (
-          <>
-            <NavItem>
-              <Link href="/auth/signin" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
-                Sign In
-              </Link>
-            </NavItem>
-            <NavItem>
-              <Link href="/auth/signup" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                Sign Up
-              </Link>
-            </NavItem>
-          </>
+          <ActionsContainer>
+            <StyledSignIn href="/auth/signin">Sign In</StyledSignIn>
+            <StyledSignUp href="/auth/signup">Sign Up</StyledSignUp>
+          </ActionsContainer>
         )}
+
         <NavItem>
-            <ContactButton>
-              <img src="/callnow.png" alt="Call Icon" />
-              +91 7044432779
-            </ContactButton>
+          <ContactButton>
+            <img src="/callnow.png" alt="Call Icon" />
+            +91 7044432779
+          </ContactButton>
         </NavItem>
       </NavList>
 
-      {/* Mobile Navigation */}
+      {/* Mobile Menu */}
       <MobileMenu className={menuOpen ? "active" : ""}>
         {navLinks.map(({ id, label }) => (
           <NavItem key={id}>
@@ -131,37 +131,45 @@ const Navbar = () => {
         {isAuthenticated ? (
           <>
             <NavItem>
-              <Link href="/dashboard" className="flex items-center text-gray-700 hover:text-blue-600 transition-colors">
-                <User size={20} className="mr-2" />
-                {user?.fullName || 'Dashboard'}
+              <Link
+                href="/dashboard"
+                className="flex items-center text-gray-700 hover:text-blue-600 transition-colors text-sm"
+              >
+                <User size={18} className="mr-1" />
+                {user?.fullName || "Dashboard"}
               </Link>
             </NavItem>
             <NavItem>
               <button
                 onClick={logout}
-                className="flex items-center text-gray-700 hover:text-red-600 transition-colors"
+                className="flex items-center text-gray-700 hover:text-red-600 transition-colors text-sm"
               >
-                <LogOut size={20} className="mr-2" />
+                <LogOut size={18} className="mr-1" />
                 Logout
               </button>
             </NavItem>
           </>
         ) : (
-          <>
-            <NavItem>
-              <Link href="/auth/signin" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
-                Sign In
-              </Link>
-            </NavItem>
-            <NavItem>
-              <Link href="/auth/signup" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                Sign Up
-              </Link>
-            </NavItem>
-          </>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "12px",
+              marginTop: "20px",
+              width: "100%",
+            }}
+          >
+            <StyledSignIn href="/auth/signin" style={{ textAlign: "center" }}>
+              Sign In
+            </StyledSignIn>
+            <StyledSignUp href="/auth/signup" style={{ textAlign: "center" }}>
+              Sign Up
+            </StyledSignUp>
+          </div>
         )}
+
         <NavItem>
-          <a href={`tel:${7044432779}`}>
+          <a href="tel:7044432779">
             <ContactButton>
               <img src="/callnow.png" alt="Call Icon" />
               +91 7044432779

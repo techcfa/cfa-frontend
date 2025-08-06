@@ -29,7 +29,7 @@ export default function Footer() {
         >
           <LeftSection>
             <Link href="/" passHref>
-              <FooterLogo src="FLogo.png" alt="Logo" />
+              <FooterLogo src="/FLogo.png" alt="Logo" />
             </Link>
             <h3>Cyber Fraud Protection Across India</h3> <br />
             <p>
@@ -37,7 +37,7 @@ export default function Footer() {
             </p>
             <SocialIcons>
               <a href="https://www.linkedin.com/company/">
-                <img src="Linkedin.png" alt="LinkedIn" />
+                <img src="/linkedin1.png" alt="LinkedIn" />
               </a>
             </SocialIcons>
           </LeftSection>

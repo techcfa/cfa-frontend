@@ -6,7 +6,9 @@ import { motion, useInView } from "framer-motion";
 
 // Styled Components
 const Section = styled.section`
-         >min-height: 90vh;
+  position: relative;
+  width: 100%;
+  min-height: 90vh;
   padding: 3rem 150px;
   display: flex;
   align-items: center;
@@ -219,23 +221,6 @@ const HomeSection: React.FC = () => {
             else if (info.offset.x > 80) handleSwipe(-1);
           }}
         >
-
-        <USP
-          as={motion.p}
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.5, duration: 1 }}
-        >
-          <strong>
-            If your insurance claim is rejected, we’ll file and fight your case
-            in Consumer Court — at <u>NO extra fee</u>. Court case fee is included
-            in your subscription.
-          </strong>
-        </USP>
-
-
-
-
           {/* Slide 1 */}
           <CarouselSlide>
             <Content
@@ -304,7 +289,6 @@ const HomeSection: React.FC = () => {
           />
         ))}
       </DotsContainer>
-
     </Section>
   );
 };
