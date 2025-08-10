@@ -4,61 +4,76 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Phone, Lock, ArrowLeft, Shield, User, Mail } from "lucide-react";
+import { Eye, EyeOff, Lock, ArrowLeft, Shield, User, Mail } from "lucide-react";
 import { authService } from "../../services/authService";
 import { useAuth } from "../../contexts/AuthContext";
 import * as S from "./SignUpStyles";
 
-const StepIndicator = ({ current }: { current: "phone" | "otp" | "details" }) => {
-  const steps = [
-    { key: "phone", label: "Phone" },
-    { key: "otp", label: "OTP" },
-    { key: "details", label: "Details" },
-  ];
-  const activeIndex = steps.findIndex((s) => s.key === current);
-
-  return (
-    <S.StepWrapper>
-      {steps.map((s, idx) => (
-        <React.Fragment key={s.key}>
-          <S.StepCircle active={idx <= activeIndex}>{idx + 1}</S.StepCircle>
-          <S.StepLabel active={idx <= activeIndex}>{s.label}</S.StepLabel>
-          {idx < steps.length - 1 && <S.StepLine active={activeIndex > idx} />}
-        </React.Fragment>
-      ))}
-    </S.StepWrapper>
-  );
-};
+// Email-only signup with two steps: details -> OTP verification
 
 const SignUpPage: React.FC = () => {
   const router = useRouter();
   const { login } = useAuth();
-  const [step, setStep] = useState<"phone" | "otp" | "details">("phone");
+  const [step, setStep] = useState<"details" | "otp">("details");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [otp, setOtp] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
   const [confirmPwd, setConfirmPwd] = useState("");
   const [showPwd, setShowPwd] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [otp, setOtp] = useState("");
   const [count, setCount] = useState(0);
-
+  
   const startCount = () => {
     setCount(60);
-    const iv = setInterval(() => setCount((c) => (c <= 1 ? (clearInterval(iv), 0) : c - 1)), 1000);
+    const iv = setInterval(() => {
+      setCount((c) => {
+        if (c <= 1) {
+          clearInterval(iv);
+          return 0;
+        }
+        return c - 1;
+      });
+    }, 1000);
   };
 
-  const sendOTP = async () => {
-    if (mobile.length !== 10) return setError("Enter a valid 10-digit mobile");
-    // ...
+  const sendSignupOTP = async () => {
+    setError(""); setSuccess("");
+    if (!name.trim()) return setError("Full name is required");
+    if (!email.trim()) return setError("Email is required");
+    if (!pwd.trim()) return setError("Password is required");
+    if (pwd !== confirmPwd) return setError("Passwords do not match");
+    try {
+      setLoading(true);
+      await authService.signupSendOtp({ fullName: name.trim(), email: email.trim(), password: pwd });
+      setSuccess("Verification code sent to your email");
+      setStep("otp");
+      startCount();
+    } catch (e: any) {
+      setError(e.response?.data?.message || "Failed to send verification code.");
+    } finally {
+      setLoading(false);
+    }
   };
-  const verifyOTP = async () => { /* ... */ };
-  const handleRegister = async () => { /* ... */ };
-  const resend = async () => { /* ... */ };
+
+  const verifySignupOTP = async () => {
+    setError(""); setSuccess("");
+    if (otp.length !== 6) return setError("Enter valid 6-digit OTP");
+    try {
+      setLoading(true);
+      const resp = await authService.signupVerifyOtp({ email: email.trim(), otp });
+      setSuccess("Account verified! Redirecting...");
+      login(resp.user, resp.token);
+      setTimeout(() => router.push("/dashboard"), 1200);
+    } catch (e: any) {
+      setError(e.response?.data?.message || "Invalid or expired OTP.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <S.PageContainer>
@@ -70,8 +85,7 @@ const SignUpPage: React.FC = () => {
         </S.BackLink>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <S.Card>
-            <StepIndicator current={step} />
+            <S.Card>
 
             <S.Header>
               <S.IconCircle><Shield size={24} /></S.IconCircle>
@@ -81,57 +95,6 @@ const SignUpPage: React.FC = () => {
 
             {error && <S.Alert type="error">{error}</S.Alert>}
             {success && <S.Alert type="success">{success}</S.Alert>}
-
-            {step === "phone" && (
-              <S.Form>
-                <S.Field>
-                  <label>Mobile Number</label>
-                  <S.InputIcon>
-                    <Phone size={18} />
-                    <input
-                      type="tel"
-                      value={mobile}
-                      onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                      placeholder="Enter mobile number"
-                      maxLength={10}
-                    />
-                  </S.InputIcon>
-                </S.Field>
-                <S.Button disabled={mobile.length !== 10 || loading} onClick={sendOTP}>
-                  {loading ? "Sending..." : "Send OTP"}
-                </S.Button>
-              </S.Form>
-            )}
-
-            {step === "otp" && (
-              <S.Form>
-                <S.Field>
-                  <label>OTP Verification</label>
-                  <S.InputIcon>
-                    <input
-                      type="text"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                      placeholder="Enter 6-digit OTP"
-                      maxLength={6}
-                    />
-                  </S.InputIcon>
-                </S.Field>
-
-                <S.Row>
-                  <S.Button disabled={otp.length !== 6 || loading} onClick={verifyOTP}>
-                    Verify
-                  </S.Button>
-                  <S.Button variant="outline" disabled={count > 0} onClick={resend}>
-                    {count > 0 ? `${count}s` : "Resend"}
-                  </S.Button>
-                </S.Row>
-
-                <S.Button variant="ghost" onClick={() => setStep("phone")}>
-                  ← Back
-                </S.Button>
-              </S.Form>
-            )}
 
             {step === "details" && (
               <S.Form>
@@ -193,11 +156,36 @@ const SignUpPage: React.FC = () => {
                   </S.InputIcon>
                 </S.Field>
 
-                <S.Button disabled={loading} onClick={handleRegister}>
-                  {loading ? "Creating Account..." : "Create Account"}
+                <S.Button disabled={loading} onClick={sendSignupOTP}>
+                  {loading ? "Sending..." : "Send Verification Code"}
                 </S.Button>
-                <S.Button variant="ghost" onClick={() => setStep("otp")}>
-                  ← Back to OTP
+              </S.Form>
+            )}
+
+            {step === "otp" && (
+              <S.Form>
+                <S.Field>
+                  <label>Enter OTP</label>
+                  <S.InputIcon>
+                    <input
+                      type="text"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                      placeholder="6-digit code"
+                      maxLength={6}
+                    />
+                  </S.InputIcon>
+                </S.Field>
+                <S.Row>
+                  <S.Button disabled={otp.length !== 6 || loading} onClick={verifySignupOTP}>
+                    Verify
+                  </S.Button>
+                  <S.Button variant="outline" disabled={count > 0} onClick={sendSignupOTP}>
+                    {count > 0 ? `${count}s` : "Resend"}
+                  </S.Button>
+                </S.Row>
+                <S.Button variant="ghost" onClick={() => setStep("details")}>
+                  ← Back
                 </S.Button>
               </S.Form>
             )}

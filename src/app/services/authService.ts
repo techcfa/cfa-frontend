@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5004';
+const API_BASE_URL = 'https://api.cyberfraudprotection.com';
 
 // Create axios instance with base configuration
 const api = axios.create({
@@ -55,6 +55,12 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface RegisterRequest {
+  fullName: string;
+  email: string;
+  password: string;
+}
+
 export interface ForgotPasswordRequest {
   mobileNumber: string;
 }
@@ -71,11 +77,32 @@ export interface AuthResponse {
   user: {
     id: string;
     fullName: string;
-    mobileNumber: string;
+    mobileNumber?: string;
     email: string;
     customerId: string;
     isVerified?: boolean;
   };
+}
+
+export interface SignupSendOtpRequest {
+  fullName: string;
+  email: string;
+  password: string;
+}
+
+export interface SignupVerifyOtpRequest {
+  email: string;
+  otp: string;
+}
+
+export interface ForgotPasswordEmailSendOtpRequest {
+  email: string;
+}
+
+export interface ForgotPasswordEmailVerifyOtpRequest {
+  email: string;
+  otp: string;
+  newPassword: string;
 }
 
 export const authService = {
@@ -95,6 +122,34 @@ export const authService = {
   login: async (data: LoginRequest) => {
     const response = await api.post('/api/auth/login', data);
     return response.data as AuthResponse;
+  },
+
+  // Register user (email only)
+  register: async (data: RegisterRequest) => {
+    const response = await api.post('/api/auth/register', data);
+    return response.data as AuthResponse;
+  },
+
+  // Email-only signup with OTP
+  signupSendOtp: async (data: SignupSendOtpRequest) => {
+    const response = await api.post('/api/auth/signup/send-otp', data);
+    return response.data as { message: string };
+  },
+
+  signupVerifyOtp: async (data: SignupVerifyOtpRequest) => {
+    const response = await api.post('/api/auth/signup/verify-otp', data);
+    return response.data as AuthResponse;
+  },
+
+  // Forgot password via email OTP
+  forgotPasswordEmailSendOtp: async (data: ForgotPasswordEmailSendOtpRequest) => {
+    const response = await api.post('/api/auth/forgot-password/send-otp', data);
+    return response.data as { message: string };
+  },
+
+  forgotPasswordEmailVerify: async (data: ForgotPasswordEmailVerifyOtpRequest) => {
+    const response = await api.post('/api/auth/forgot-password/verify-otp', data);
+    return response.data as { message: string };
   },
 
   // Send OTP for password reset

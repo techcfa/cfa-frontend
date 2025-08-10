@@ -5,7 +5,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 interface User {
   id: string;
   fullName: string;
-  mobileNumber: string;
+  mobileNumber?: string;
   email: string;
   customerId: string;
   isVerified?: boolean;
