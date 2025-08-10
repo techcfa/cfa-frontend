@@ -4,14 +4,14 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Phone, Lock, ArrowLeft, Shield } from "lucide-react";
+import { Eye, EyeOff, Lock, ArrowLeft, Shield, Mail } from "lucide-react";
 import { authService } from "../../services/authService";
 import * as S from "./ForgotPasswordStyles";
 
 // Inline Step UI
-const StepIndicator = ({ current }: { current: "mobile" | "otp" | "reset" }) => {
+const StepIndicator = ({ current }: { current: "email" | "otp" | "reset" }) => {
   const steps = [
-    { key: "mobile", label: "Mobile" },
+    { key: "email", label: "Email" },
     { key: "otp", label: "OTP" },
     { key: "reset", label: "Reset" },
   ];
@@ -35,11 +35,11 @@ const StepIndicator = ({ current }: { current: "mobile" | "otp" | "reset" }) => 
 
 const ForgotPasswordPage: React.FC = () => {
   const router = useRouter();
-  const [step, setStep] = useState<"mobile" | "otp" | "reset">("mobile");
+  const [step, setStep] = useState<"email" | "otp" | "reset">("email");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [mobile, setMobile] = useState("");
+  const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [newPwd, setNewPwd] = useState("");
   const [confirmPwd, setConfirmPwd] = useState("");
@@ -61,15 +61,15 @@ const ForgotPasswordPage: React.FC = () => {
   };
 
   const sendOTP = async () => {
-    if (mobile.length !== 10) {
-      setError("Enter valid 10-digit mobile");
+    if (!email.trim()) {
+      setError("Enter a valid email");
       return;
     }
     setLoading(true);
     setError("");
     setSuccess("");
     try {
-      await authService.forgotPassword({ mobileNumber: mobile });
+      await authService.forgotPasswordEmailSendOtp({ email: email.trim() });
       setSuccess("OTP sent successfully");
       setStep("otp");
       startCount();
@@ -101,7 +101,7 @@ const ForgotPasswordPage: React.FC = () => {
     setError("");
     setSuccess("");
     try {
-      await authService.resetPassword({ mobileNumber: mobile, otp, newPassword: newPwd });
+      await authService.forgotPasswordEmailVerify({ email: email.trim(), otp, newPassword: newPwd });
       setSuccess("Password reset! Redirecting...");
       setTimeout(() => router.push("/auth/signin"), 1500);
     } catch (e: any) {
@@ -133,10 +133,10 @@ const ForgotPasswordPage: React.FC = () => {
               </S.IconCircle>
               <h1>Reset Password</h1>
               <p>
-                {step === "mobile"
-                  ? "Enter your mobile number to receive a code."
+                {step === "email"
+                  ? "Enter your email to receive a code."
                   : step === "otp"
-                  ? "Enter the OTP sent to your mobile."
+                  ? "Enter the OTP sent to your email."
                   : "Create your new password."}
               </p>
             </S.Header>
@@ -144,23 +144,17 @@ const ForgotPasswordPage: React.FC = () => {
             {error && <S.Alert type="error">{error}</S.Alert>}
             {success && <S.Alert type="success">{success}</S.Alert>}
 
-            {/* Mobile Step */}
-            {step === "mobile" && (
+            {/* Email Step */}
+            {step === "email" && (
               <S.Form>
                 <S.Field>
-                  <label>Mobile Number</label>
+                  <label>Email</label>
                   <S.InputIcon>
-                    <Phone size={18} />
-                    <input
-                      type="tel"
-                      value={mobile}
-                      onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                      placeholder="Enter mobile number"
-                      maxLength={10}
-                    />
+                    <Mail size={18} />
+                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter email" />
                   </S.InputIcon>
                 </S.Field>
-                <S.Button disabled={mobile.length !== 10 || loading} onClick={sendOTP}>
+                <S.Button disabled={!email || loading} onClick={sendOTP}>
                   {loading ? "Sending..." : "Send OTP"}
                 </S.Button>
               </S.Form>
@@ -189,7 +183,7 @@ const ForgotPasswordPage: React.FC = () => {
                     {count > 0 ? `${count}s` : "Resend"}
                   </S.Button>
                 </S.Row>
-                <S.Button variant="ghost" onClick={() => setStep("mobile")}>
+                <S.Button variant="ghost" onClick={() => setStep("email")}>
                   ← Back
                 </S.Button>
               </S.Form>

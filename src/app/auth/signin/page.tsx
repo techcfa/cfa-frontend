@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Phone, Mail, Lock, ArrowLeft, Shield, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, ArrowLeft, Shield } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { authService } from '../../services/authService';
 import * as S from './SignInStyles';
@@ -15,8 +15,6 @@ const SignInPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [loginMethod, setLoginMethod] = useState<'mobile' | 'email'>('mobile');
-  const [mobileNumber, setMobileNumber] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -26,7 +24,7 @@ const SignInPage: React.FC = () => {
     setIsLoading(true);
     setError(''); setSuccess('');
     try {
-      const loginData = loginMethod === 'mobile' ? { mobileNumber, password } : { email, password };
+      const loginData = { email, password };
       const resp = await authService.login(loginData);
       login(resp.user, resp.token);
       setSuccess('Login successful! Redirecting...');
@@ -64,32 +62,12 @@ const SignInPage: React.FC = () => {
             {error && <S.Alert type="error">{error}</S.Alert>}
             {success && <S.Alert type="success">{success}</S.Alert>}
 
-            <S.ToggleWrapper>
-              <button onClick={() => setLoginMethod('mobile')} className={loginMethod === 'mobile' ? 'active' : ''}>
-                <Phone size={14} /> Mobile
-              </button>
-              <button onClick={() => setLoginMethod('email')} className={loginMethod === 'email' ? 'active' : ''}>
-                <Mail size={14} /> Email
-              </button>
-            </S.ToggleWrapper>
-
             <form onSubmit={handleSignIn}>
               <S.InputWrapper>
-                <label>
-                  {loginMethod === 'mobile' ? 'Mobile Number' : 'Email'}
-                </label>
+                <label>Email</label>
                 <div className="input-icon">
-                  {loginMethod === 'mobile' ? <Phone size={18} /> : <Mail size={18} />}
-                  <input
-                    type={loginMethod === 'mobile' ? 'tel' : 'email'}
-                    value={loginMethod === 'mobile' ? mobileNumber : email}
-                    onChange={(e) => {
-                      loginMethod === 'mobile'
-                        ? setMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10))
-                        : setEmail(e.target.value);
-                    }}
-                    placeholder={loginMethod === 'mobile' ? 'Enter mobile number' : 'Enter email'}
-                  />
+                  <Mail size={18} />
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter email" />
                 </div>
               </S.InputWrapper>
 
@@ -116,10 +94,7 @@ const SignInPage: React.FC = () => {
               </S.Button>
             </form>
 
-            <S.DemoBox>
-              <h4><CheckCircle size={16} /> Demo Credentials</h4>
-              <p>Mobile: 8707711852<br />Password: any<br />OTP: 123456</p>
-            </S.DemoBox>
+            {/* DemoBox removed since login is email-only */}
 
             <S.FooterText>
               Don't have an account? <Link href="/auth/signup"><span>Sign Up</span></Link>
