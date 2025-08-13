@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Admin {
   id: string;
@@ -27,6 +28,7 @@ export const useAdminAuth = () => {
 };
 
 export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
+  const router = useRouter();
   const [admin, setAdmin] = useState<Admin | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -58,6 +60,7 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
     setToken(null);
     localStorage.removeItem('cfa_admin_token');
     localStorage.removeItem('cfa_admin');
+    router.push('/admin/login');
   };
 
   return (

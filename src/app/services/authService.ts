@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://api.cyberfraudprotection.com';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.cyberfraudprotection.com';
 
 // Create axios instance with base configuration
 const api = axios.create({
@@ -13,7 +13,7 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('cfa_token');
+    const token = typeof window !== 'undefined' ? localStorage.getItem('cfa_token') : null;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -29,9 +29,15 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('cfa_token');
-      localStorage.removeItem('cfa_user');
-      window.location.href = '/auth/signin';
+      if (typeof window !== 'undefined') {
+        // Only redirect if we're not already on an auth page
+        const currentPath = window.location.pathname;
+        if (!currentPath.startsWith('/auth/') && !currentPath.startsWith('/admin/')) {
+          localStorage.removeItem('cfa_token');
+          localStorage.removeItem('cfa_user');
+          window.location.href = '/auth/signin';
+        }
+      }
     }
     return Promise.reject(error);
   }
@@ -77,7 +83,7 @@ export interface AuthResponse {
   user: {
     id: string;
     fullName: string;
-    mobileNumber?: string;
+    mobile: string;
     email: string;
     customerId: string;
     isVerified?: boolean;
@@ -87,6 +93,7 @@ export interface AuthResponse {
 export interface SignupSendOtpRequest {
   fullName: string;
   email: string;
+  mobile: string;
   password: string;
 }
 

@@ -1,8 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import styled from "styled-components";
+import { subscriptionService, type SubscriptionPlan } from "../services/subscriptionService";
+import { useAuth } from "../contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 const Section = styled.section`
   padding: 40px 150px;
@@ -136,6 +139,30 @@ const CorporateNote = styled.div`
 `;
 
 export default function Plans() {
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
+  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const run = async () => {
+      try { setLoading(true); setError(""); const data = await subscriptionService.getPlans(); setPlans(data.filter(p=>p.isActive!==false)); }
+      catch (e: any) { setError(e.response?.data?.message || "Failed to load plans"); }
+      finally { setLoading(false); }
+    };
+    run();
+  }, []);
+
+  const handleSelect = async (plan: SubscriptionPlan) => {
+    if (!isAuthenticated) {
+      router.push("/auth/signin");
+      return;
+    }
+    localStorage.setItem("cfa_selected_plan", JSON.stringify(plan));
+    router.push("/subscription/checkout");
+  };
+
   return (
     <Section id="plans">
       <Heading>
@@ -143,65 +170,39 @@ export default function Plans() {
       </Heading>
       <Subheading>Simple, Transparent Pricing — No Hidden Charges</Subheading>
 
+      {error && <div style={{color:'#b91c1c', marginBottom: '1rem'}}>{error}</div>}
+      {loading && <div>Loading plans…</div>}
       <CardsContainer>
-        {/* Family / Group Plan */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-        >
-          <Card>
-            <Icon src="/family.png" alt="Family Icon" />
-            <Title>Family/Group of 4</Title>
-            <PriceTable>
-              <PriceRow>
-                <span>Monthly</span>
-                <span>₹1,200</span>
-              </PriceRow>
-              <PriceRow>
-                <span>Half-Yearly</span>
-                <span>₹6,000</span>
-              </PriceRow>
-              <PriceRow>
-                <span>Yearly</span>
-                <span>₹12,000</span>
-              </PriceRow>
-            </PriceTable>
-            <Note>₹300 per person/month</Note>
-          </Card>
-        </motion.div>
-
-        {/* Corporate Plan */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
-        >
-          <Card>
-            <Icon src="/corporate.png" alt="Corporate Icon" />
-            <Title>Corporate (per 4 people)</Title>
-            <PriceTable>
-              <PriceRow>
-                <span>Monthly</span>
-                <span>₹1,200</span>
-              </PriceRow>
-              <PriceRow>
-                <span>Half-Yearly</span>
-                <span>₹6,000</span>
-              </PriceRow>
-              <PriceRow>
-                <span>Yearly</span>
-                <span>₹12,000</span>
-              </PriceRow>
-            </PriceTable>
-            <CorporateNote>
-              <span className="star">✨</span> 10% Corporate Discount
-              <br />
-              <small>If company pays for all employees</small>
-            </CorporateNote>
-            <Note>₹300 per person/month</Note>
-          </Card>
-        </motion.div>
+        {plans.map((p, idx) => (
+          <motion.div key={p._id}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut", delay: idx * 0.1 }}
+          >
+            <Card>
+              <Icon src="/services/card1.png" alt={p.planName} />
+              <Title>{p.planName}</Title>
+              <div style={{color:'#555'}}>{p.description}</div>
+              <PriceTable>
+                <PriceRow>
+                  <span>Price</span>
+                  <span>₹{p.specialPrice ?? p.price}</span>
+                </PriceRow>
+                <PriceRow>
+                  <span>Duration</span>
+                  <span>{p.duration} months</span>
+                </PriceRow>
+                <PriceRow>
+                  <span>Max Members</span>
+                  <span>{p.maxMembers}</span>
+                </PriceRow>
+              </PriceTable>
+              <Note>
+                <button onClick={()=>handleSelect(p)} style={{background:'#2563eb',color:'#fff',padding:'0.6rem 1rem',borderRadius:'0.75rem',border:'none',fontWeight:700}}>Choose Plan</button>
+              </Note>
+            </Card>
+          </motion.div>
+        ))}
       </CardsContainer>
     </Section>
   );

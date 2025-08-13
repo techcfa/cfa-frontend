@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://api.cyberfraudprotection.com';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.cyberfraudprotection.com';
 // Separate axios instance for admin with its own token storage
 const adminApi = axios.create({
   baseURL: API_BASE_URL,
@@ -22,7 +22,11 @@ adminApi.interceptors.response.use(
       localStorage.removeItem('cfa_admin_token');
       localStorage.removeItem('cfa_admin');
       if (typeof window !== 'undefined') {
-        window.location.href = '/admin/login';
+        // Only redirect to admin login if we're on an admin page
+        const currentPath = window.location.pathname;
+        if (currentPath.startsWith('/admin/')) {
+          window.location.href = '/admin/login';
+        }
       }
     }
     return Promise.reject(error);
@@ -70,6 +74,7 @@ export interface AdminUserListResponse {
     _id: string;
     fullName: string;
     email: string;
+    mobile: string;
     customerId: string;
     subscription?: { status: string; planId: string; planName: string; amount: number };
     createdAt: string;
@@ -84,6 +89,7 @@ export interface AdminUserDetailResponse {
     _id: string;
     fullName: string;
     email: string;
+    mobile: string;
     customerId: string;
     subscription?: {
       planId: string; planName: string; status: string; startDate: string; endDate: string; amount: number;
@@ -95,61 +101,32 @@ export interface AdminUserDetailResponse {
 
 export interface UpdateSubscriptionRequest { status?: string; planId?: string; amount?: number }
 
-export interface SubscriptionPlan {
-  _id: string;
-  planId: string;
-  planName: string;
-  description: string;
-  price: number;
-  duration: number;
-  maxMembers: number;
-  features: string[];
-  isSpecialOffer: boolean;
-  specialPrice: number | null;
-}
 
-export interface CreateSubscriptionRequest {
-  planId: string;
-  planName: string;
-  description: string;
-  price: number;
-  duration: number;
-  maxMembers: number;
-  features: string[];
-  isSpecialOffer: boolean;
-  specialPrice?: number | null;
-}
-
-export interface UpdateSubscriptionRequestBody {
-  planName?: string;
-  description?: string;
-  price?: number;
-  duration?: number;
-  maxMembers?: number;
-  features?: string[];
-  isSpecialOffer?: boolean;
-  specialPrice?: number | null;
-}
 
 export interface MediaItem {
   _id: string;
   title: string;
   description: string;
-  type: 'article' | 'video' | 'podcast' | 'update' | 'alert';
-  content: string;
-  tags: string[];
-  isPublished: boolean;
-  isBroadcast: boolean;
+  type: 'image' | 'video';
+  mediaUrl: string;
+  thumbnailUrl?: string;
+  fileSize: number;
+  mimeType: string;
+  viewCount: number;
+  isActive: boolean;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface CreateMediaRequest {
+export interface MediaUploadRequest {
   title: string;
   description: string;
-  type: 'article' | 'video' | 'podcast' | 'update' | 'alert';
-  content: string;
-  tags?: string[];
-  isPublished: boolean;
-  isBroadcast: boolean;
+}
+
+export interface UpdateMediaRequest {
+  title?: string;
+  description?: string;
 }
 
 export const adminService = {
@@ -183,34 +160,18 @@ export const adminService = {
     return response.data as { message: string; subscription: any };
   },
 
-  listSubscriptions: async () => {
-    const response = await adminApi.get('/api/admin/subscriptions');
-    return response.data as SubscriptionPlan[];
-  },
 
-  createSubscription: async (body: CreateSubscriptionRequest) => {
-    const response = await adminApi.post('/api/admin/subscriptions', body);
-    return response.data as { message: string; subscription: any };
-  },
 
-  updateSubscription: async (id: string, body: UpdateSubscriptionRequestBody) => {
-    const response = await adminApi.put(`/api/admin/subscriptions/${id}`, body);
-    return response.data as { message: string; subscription: any };
-  },
-
-  createMedia: async (body: CreateMediaRequest) => {
-    const response = await adminApi.post('/api/media', body);
+  uploadMedia: async (file: File, title: string, description: string) => {
+    const form = new FormData();
+    form.append('media', file);
+    form.append('title', title);
+    form.append('description', description);
+    const response = await adminApi.post('/api/media/upload', form, { headers: { 'Content-Type': 'multipart/form-data' } });
     return response.data as { message: string; media: MediaItem };
   },
 
-  uploadMedia: async (file: File) => {
-    const form = new FormData();
-    form.append('media', file);
-    const response = await adminApi.post('/api/media/upload', form, { headers: { 'Content-Type': 'multipart/form-data' } });
-    return response.data as { message: string; fileUrl: string; filename: string; originalName: string; size: number };
-  },
-
-  updateMedia: async (id: string, body: Partial<CreateMediaRequest>) => {
+  updateMedia: async (id: string, body: UpdateMediaRequest) => {
     const response = await adminApi.put(`/api/media/${id}`, body);
     return response.data as { message: string; media: MediaItem };
   },
@@ -220,7 +181,7 @@ export const adminService = {
     return response.data as { message: string };
   },
 
-  listAllMedia: async (params?: { type?: string; status?: 'published'|'draft'; page?: number; limit?: number }) => {
+  listAllMedia: async (params?: { type?: 'image' | 'video'; page?: number; limit?: number }) => {
     const response = await adminApi.get('/api/media/admin/all', { params });
     return response.data as { media: MediaItem[]; totalPages: number; currentPage: number; total: number };
   },

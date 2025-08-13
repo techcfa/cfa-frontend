@@ -3,8 +3,7 @@ import { Montserrat, Lato, Poppins, Nunito_Sans } from "next/font/google";
 import "./globals.css";
 import StyledComponentsRegistry from "./Registry";
 import { AuthProvider } from "./contexts/AuthContext";
-import Navbar from "../../src/app/Components/Navbar";
-import Footer from "../../src/app/Components/Footer";
+import ConditionalLayout from "./Components/ConditionalLayout";
 
 // Load fonts
 const montserrat = Montserrat({
@@ -64,11 +63,9 @@ export default function RootLayout({
       >
         <StyledComponentsRegistry>
           <AuthProvider>
-            <Navbar />
-            <main className="flex-1">
+            <ConditionalLayout>
               {children}
-            </main>
-            <Footer />
+            </ConditionalLayout>
           </AuthProvider>
         </StyledComponentsRegistry>
       </body>
