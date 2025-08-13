@@ -25,11 +25,17 @@ const SignInPage: React.FC = () => {
     setError(''); setSuccess('');
     try {
       const loginData = { email, password };
+      console.log('Attempting login with:', loginData);
       const resp = await authService.login(loginData);
+      console.log('Login response:', resp);
       login(resp.user, resp.token);
       setSuccess('Login successful! Redirecting...');
-      setTimeout(() => router.push('/dashboard'), 1500);
+      setTimeout(() => {
+        console.log('Redirecting to dashboard...');
+        router.push('/dashboard');
+      }, 1500);
     } catch (err: any) {
+      console.error('Login error:', err);
       setError(err.response?.data?.message || 'Login failed.');
     } finally {
       setIsLoading(false);
