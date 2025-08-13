@@ -5,7 +5,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 interface User {
   id: string;
   fullName: string;
-  mobileNumber?: string;
+  mobile: string;
   email: string;
   customerId: string;
   isVerified?: boolean;
@@ -67,8 +67,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = () => {
     setUser(null);
     setToken(null);
-    localStorage.removeItem('cfa_token');
-    localStorage.removeItem('cfa_user');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('cfa_token');
+      localStorage.removeItem('cfa_user');
+    }
   };
 
   const value: AuthContextType = {
