@@ -1040,19 +1040,19 @@ const DashboardPage = () => {
                         {plan.description}
                       </p>
                       
-                      <div style={{ marginBottom: '1.5rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <span style={{ fontSize: '2rem', fontWeight: '700', color: '#dc2626', textDecoration: 'line-through' }}>
-                            ₹{plan.price}
-                          </span>
-                          <span style={{ fontSize: '2.5rem', fontWeight: '700', color: '#10b981' }}>
-                            ₹0
-                          </span>
+                                             <div style={{ marginBottom: '1.5rem' }}>
+                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                           <span style={{ fontSize: '2rem', fontWeight: '700', color: '#dc2626', textDecoration: 'line-through' }}>
+                             ₹500
+                           </span>
+                           <span style={{ fontSize: '2.5rem', fontWeight: '700', color: '#10b981' }}>
+                             ₹0
+                           </span>
+                          </div>
+                          <p style={{ fontSize: '0.8rem', color: '#6b7280', margin: '0.5rem 0 0 0' }}>
+                            Special offer - Free for {plan.duration} months!
+                          </p>
                         </div>
-                        <p style={{ fontSize: '0.8rem', color: '#6b7280', margin: '0.5rem 0 0 0' }}>
-                          Special offer - Free for {plan.duration} months!
-                        </p>
-                      </div>
 
                       <PlanFeatures>
                         {plan.features.map((feature, index) => (
