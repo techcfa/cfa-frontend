@@ -702,7 +702,6 @@ const MediaInner: React.FC = () => {
                               {formatFileSize(media.fileSize)}
                             </span>
                           </div>
-                          <span>{media.viewCount} views</span>
                         </MediaMeta>
                         
                         <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '1rem' }}>
@@ -840,7 +839,6 @@ const MediaInner: React.FC = () => {
                     <li>Automatic type detection (image/video)</li>
                     <li>Public access URLs</li>
                     <li>File size up to 100MB</li>
-                    <li>View count tracking</li>
                   </ul>
                   
                   <h4 style={{ margin: '1rem 0 0.5rem', color: '#374151' }}>Supported Formats:</h4>
