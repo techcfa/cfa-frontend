@@ -172,12 +172,12 @@ const SignUpPage: React.FC = () => {
                   <label>Mobile Number</label>
                   <S.InputIcon>
                     <Phone size={18} />
-                    <input
-                      type="tel"
-                      value={mobile}
-                      onChange={(e) => setMobile(e.target.value)}
-                      placeholder="+1234567890"
-                    />
+                                         <input
+                       type="tel"
+                       value={mobile}
+                       onChange={(e) => setMobile(e.target.value)}
+                       placeholder="+91 "
+                     />
                   </S.InputIcon>
                 </S.Field>
 
@@ -285,7 +285,7 @@ const SignUpPage: React.FC = () => {
                         <div style={{ textAlign: 'right' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#ef4444', textDecoration: 'line-through' }}>
-                              ₹{plan.price}
+                              ₹500
                             </span>
                             <span style={{ fontSize: '28px', fontWeight: 'bold', color: '#10b981' }}>
                               ₹0

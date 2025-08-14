@@ -1040,19 +1040,19 @@ const DashboardPage = () => {
                         {plan.description}
                       </p>
                       
-                      <div style={{ marginBottom: '1.5rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <span style={{ fontSize: '2rem', fontWeight: '700', color: '#dc2626', textDecoration: 'line-through' }}>
-                            ₹{plan.price}
-                          </span>
-                          <span style={{ fontSize: '2.5rem', fontWeight: '700', color: '#10b981' }}>
-                            ₹0
-                          </span>
+                                             <div style={{ marginBottom: '1.5rem' }}>
+                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                           <span style={{ fontSize: '2rem', fontWeight: '700', color: '#dc2626', textDecoration: 'line-through' }}>
+                             ₹500
+                           </span>
+                           <span style={{ fontSize: '2.5rem', fontWeight: '700', color: '#10b981' }}>
+                             ₹0
+                           </span>
+                          </div>
+                          <p style={{ fontSize: '0.8rem', color: '#6b7280', margin: '0.5rem 0 0 0' }}>
+                            Special offer - Free for {plan.duration} months!
+                          </p>
                         </div>
-                        <p style={{ fontSize: '0.8rem', color: '#6b7280', margin: '0.5rem 0 0 0' }}>
-                          Special offer - Free for {plan.duration} months!
-                        </p>
-                      </div>
 
                       <PlanFeatures>
                         {plan.features.map((feature, index) => (
@@ -1098,14 +1098,14 @@ const DashboardPage = () => {
           >
             <Card>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <div>
-                  <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#111827', margin: '0 0 0.5rem 0' }}>
-                    Security Content Library
-                  </h2>
-                  <p style={{ color: '#6b7280', margin: '0', fontSize: '0.95rem' }}>
-                    Access exclusive cybersecurity content and educational materials
-                  </p>
-                </div>
+                                 <div>
+                   <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#111827', margin: '0 0 0.5rem 0' }}>
+                     News and Incidents
+                   </h2>
+                   <p style={{ color: '#6b7280', margin: '0', fontSize: '0.95rem' }}>
+                     Stay updated with latest cybersecurity news and incident reports
+                   </p>
+                 </div>
                 <Badge variant="primary">
                   <FileText size={12} />
                   {media.length} Items
